@@ -1,65 +1,85 @@
-package com.elianepg.rpg;
+package game;
 
+import entities.Jugador;
+import levels.Nivel;
+import levels.Nivel1_Limbo;
+import levels.Nivel2_Dite;
+import levels.Nivel3_Recuerdos;
 import java.util.Scanner;
 
 public class Game {
-    private Personaje jugador;
-    private Nivel[] niveles;
-    private int nivelActual;
-    private boolean enJuego;
+    private Jugador jugador;
+    private Nivel nivelActual;
+    private int nivelNumero;
+    private Scanner scanner;
+    private boolean juegoActivo;
 
-    public static void main(String[] args) {
-        Game juego = new Game();
-        juego.inicializarJuego();
-        juego.buclePrincipal();
+    public Game() {
+        this.scanner = new Scanner(System.in);
+        this.juegoActivo = true;
+        this.nivelNumero = 1;
     }
 
-    public void inicializarJuego() {
-        // Inicializar jugador
-        jugador = new Personaje("Leo", 100, 10, 5);
-        // Inicializar niveles
-        niveles = new Nivel[3];
-        niveles[0] = new Nivel(1, "Limbo", "Un bosque de seres olvidados...");
-        niveles[1] = new Nivel(2, "Ciudad de Dite", "Una ciudad de sombras engañosas...");
-        niveles[2] = new Nivel(3, "Palacio de Recuerdos", "Un castillo helado de traiciones...");
-        nivelActual = 0;
-        enJuego = true;
+    public void iniciarJuego() {
+        System.out.println("=== EL VIAJE DEL PEQUEÑO VALIENTE ===");
+        System.out.println("Bienvenido, viajero. ¿Cuál es tu nombre?");
+        String nombre = scanner.nextLine();
+        
+        this.jugador = new Jugador(nombre, 100, 10, 5);
+        this.nivelActual = new Nivel1_Limbo();
+        
+        buclePrincipal();
     }
 
-    public void buclePrincipal() {
-        Scanner scanner = new Scanner(System.in);
-        while (enJuego) {
-            // Mostrar menú principal
-            System.out.println("=== MENÚ PRINCIPAL ===");
-            System.out.println("1. Ver estado del personaje");
-            System.out.println("2. Ir al siguiente nivel");
-            System.out.println("3. Salir del juego");
-            System.out.print("Elige una opción: ");
-            int opcion = scanner.nextInt();
-            switch (opcion) {
-                case 1:
-                    jugador.mostrarEstado();
-                    break;
-                case 2:
-                    if (nivelActual < niveles.length) {
-                        Nivel nivel = niveles[nivelActual];
-                        nivel.iniciarNivel(jugador);
-                        if (nivel.isCompletado()) {
-                            nivelActual++;
-                        }
-                    } else {
-                        System.out.println("¡Has completado todos los niveles!");
-                        enJuego = false;
-                    }
-                    break;
-                case 3:
-                    enJuego = false;
-                    break;
-                default:
-                    System.out.println("Opción no válida.");
+    private void buclePrincipal() {
+        while (juegoActivo && jugador.estaVivo()) {
+            System.out.println("\n=== NIVEL " + nivelNumero + " ===");
+            nivelActual.mostrarDescripcion();
+            
+            boolean nivelCompletado = nivelActual.ejecutarNivel(jugador, scanner);
+            
+            if (nivelCompletado) {
+                System.out.println("¡Nivel " + nivelNumero + " completado!");
+                recompensarJugador();
+                avanzarNivel();
+            } else {
+                System.out.println("Has fallado en el nivel. ¡Inténtalo de nuevo!");
             }
         }
+        
+        if (jugador.estaVivo()) {
+            System.out.println("¡Felicidades! Has completado toda la aventura.");
+        } else {
+            System.out.println("Game Over. Tu viaje ha terminado.");
+        }
+        
         scanner.close();
-        System.out.println("¡Gracias por jugar!");
+    }
+
+    private void recompensarJugador() {
+        System.out.println("\n--- RECOMPENSA ---");
+        System.out.println("Has obtenido:");
+        System.out.println("- 1 Llave de Paso");
+        System.out.println("- 1 Estrella de Logro");
+        System.out.println("- +5 puntos de experiencia");
+        
+        jugador.agregarItem("Llave de Paso");
+        jugador.agregarItem("Estrella de Logro");
+        jugador.ganarExperiencia(5);
+    }
+
+    private void avanzarNivel() {
+        nivelNumero++;
+        switch (nivelNumero) {
+            case 2:
+                nivelActual = new Nivel2_Dite();
+                break;
+            case 3:
+                nivelActual = new Nivel3_Recuerdos();
+                break;
+            default:
+                juegoActivo = false;
+                break;
+        }
     }
 }
