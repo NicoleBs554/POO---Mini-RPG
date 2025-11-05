@@ -1,4 +1,4 @@
-package entities;
+package entidades;
 
 import items.Arma;
 import items.Armadura;

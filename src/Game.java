@@ -1,6 +1,6 @@
-package game;
+package src;
 
-import entities.Jugador;
+import entidades.Jugador;
 import levels.Nivel;
 import levels.Nivel1_Limbo;
 import levels.Nivel2_Dite;
