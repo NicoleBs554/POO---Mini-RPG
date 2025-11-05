@@ -1,9 +1,9 @@
 package levels;
 
-import entities.Jugador;
+import entidades.*;Jugador;
 import java.util.Scanner;
 
-public abstract class Nivel {
+public abstract class Nivel {   
     protected String nombre;
     protected String descripcion;
     protected int enemigosRequeridos;
