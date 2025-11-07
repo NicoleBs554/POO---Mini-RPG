@@ -11,6 +11,8 @@ public class Armadura extends Item {
     private int durabilidad;
     private int durabilidadMaxima;
     private String slot; // "cabeza", "pecho", "manos", "pies", etc.
+    private boolean equipada;
+    private int bonificacionDefensa; // Nueva variable para almacenar la bonificación
     
     public Armadura(String nombre, String descripcion, TipoItem tipo, int valor, 
                    int defensaBase, int resistenciaMagica, int agilidadPenalizacion, 
@@ -24,23 +26,43 @@ public class Armadura extends Item {
         this.durabilidadMaxima = durabilidadMaxima;
         this.durabilidad = durabilidadMaxima;
         this.slot = slot;
+        this.equipada = false;
+        this.bonificacionDefensa = defensaBase;
     }
     
     @Override
     public void usar(Jugador jugador) {
-        System.out.println("Equipas " + nombre + " en " + slot + ".");
-        reducirDurabilidad(1);
+        if (!equipada) {
+            equipar(jugador);
+        } else {
+            desequipar(jugador);
+        }
+    }
+    
+    public void equipar(Jugador jugador) {
+        if (!equipada) {
+            System.out.println("Equipas " + nombre + " en " + slot + ".");
+            aplicarEfectosEquipo(jugador);
+            equipada = true;
+            reducirDurabilidad(1);
+        }
+    }
+    
+    public void desequipar(Jugador jugador) {
+        if (equipada) {
+            System.out.println("Desequipas " + nombre + " de " + slot + ".");
+            removerEfectosEquipo(jugador);
+            equipada = false;
+        }
     }
     
     @Override
     public void aplicarEfectosEquipo(Jugador jugador) {
-        // Aplicar bonificaciones de defensa
-        jugador.setDefensa(jugador.getDefensa() + defensaBase + defensaExtra);
-        System.out.println(nombre + " equipada! +" + (defensaBase + defensaExtra) + " a la defensa.");
+        // En lugar de modificar atributos directamente, almacenamos la bonificación
+        System.out.println(nombre + " equipada! +" + bonificacionDefensa + " a la defensa.");
         
-        // Aplicar penalización de agilidad
+        // Aplicar penalización de agilidad (solo mensaje por ahora)
         if (agilidadPenalizacion > 0) {
-            jugador.setAgilidad(jugador.getAgilidad() - agilidadPenalizacion);
             System.out.println("Penalización de -" + agilidadPenalizacion + " a la agilidad.");
         }
         
@@ -55,18 +77,30 @@ public class Armadura extends Item {
     
     @Override
     public void removerEfectosEquipo(Jugador jugador) {
-        // Remover bonificaciones
-        jugador.setDefensa(jugador.getDefensa() - (defensaBase + defensaExtra));
-        System.out.println(nombre + " desequipada. -" + (defensaBase + defensaExtra) + " a la defensa.");
+        System.out.println(nombre + " desequipada. -" + bonificacionDefensa + " a la defensa.");
         
         // Remover penalización de agilidad
         if (agilidadPenalizacion > 0) {
-            jugador.setAgilidad(jugador.getAgilidad() + agilidadPenalizacion);
             System.out.println("Penalización de agilidad removida.");
         }
         
         // Remover efectos especiales
         removerEfectoEspecial(jugador);
+    }
+    
+    // Nuevo método para obtener la bonificación de defensa
+    public int getBonificacionDefensa() {
+        return bonificacionDefensa;
+    }
+    
+    // Nuevo método para verificar si está equipada
+    public boolean isEquipada() {
+        return equipada;
+    }
+    
+    // Nuevo método para obtener la penalización de agilidad
+    public int getPenalizacionAgilidad() {
+        return agilidadPenalizacion;
     }
     
     private void aplicarEfectoEspecial(Jugador jugador) {
@@ -99,6 +133,7 @@ public class Armadura extends Item {
         durabilidad = Math.max(0, durabilidad - cantidad);
         if (durabilidad <= 0) {
             System.out.println("¡" + nombre + " se ha roto!");
+            equipada = false;
         }
     }
     
@@ -109,6 +144,7 @@ public class Armadura extends Item {
     
     public void mejorar(int defensaExtra) {
         this.defensaExtra += defensaExtra;
+        this.bonificacionDefensa = defensaBase + this.defensaExtra;
         System.out.println(nombre + " mejorada! +" + defensaExtra + " defensa extra.");
     }
     

@@ -40,6 +40,4 @@ public enum TipoItem {
     
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }
-} {
-    
 }

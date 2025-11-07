@@ -92,7 +92,7 @@ public class NPC {
                 System.out.println(nombre + ": " + getDialogo(temas.get(indice)));
             } else if (indice == temas.size()) {
                 System.out.print("¿Qué quieres preguntar?: ");
-                String pregunta = scanner.nextLine();
+                String pregunta = scanner.nextLine().trim();
                 System.out.println(nombre + ": " + getDialogo("default"));
             }
         } catch (NumberFormatException e) {

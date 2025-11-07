@@ -82,11 +82,25 @@ public class Game {
         System.out.println(getDescripcionPisoActual());
         System.out.println("\nTu jornada comienza ahora...");
         
+        // Inyectar GameState en el piso actual para sincronización
+        inyectarGameStateEnPiso();
         pisoActual.play();
         
         // Verificar si el jugador completó el piso
         if (jugador.estaVivo()) {
             pisoManager.marcarPisoCompletado(pisoNumero);
+            estadoJuego.setPisoActual(pisoNumero);
+        }
+    }
+
+    private void inyectarGameStateEnPiso() {
+        // Inyectar GameState en el piso actual para que pueda actualizar estadísticas
+        if (pisoActual instanceof Piso1_Limbo) {
+            ((Piso1_Limbo) pisoActual).setGameState(estadoJuego);
+        } else if (pisoActual instanceof Piso2_Dite) {
+            ((Piso2_Dite) pisoActual).setGameState(estadoJuego);
+        } else if (pisoActual instanceof Piso3_Recuerdos) {
+            ((Piso3_Recuerdos) pisoActual).setGameState(estadoJuego);
         }
     }
 
@@ -118,6 +132,9 @@ public class Game {
         System.out.println("\n🎊 ¡PISO " + pisoNumero + " COMPLETADO! 🎊");
         System.out.println("════════════════════════════════════════");
         
+        // Actualizar estadísticas globales
+        estadoJuego.incrementarPuzzlesResueltos(); // Cada piso completado cuenta como puzzle
+        
         otorgarRecompensasPiso();
         mostrarProgresoTotal();
         
@@ -126,6 +143,7 @@ public class Game {
         } else {
             juegoActivo = false;
             estadoJuego.marcarJuegoCompletado();
+            pisoManager.marcarPisoCompletado(pisoNumero); // Asegurar que el último piso esté marcado
         }
     }
 
@@ -141,8 +159,7 @@ public class Game {
                 System.out.println("   - Habilidad: Visión en la Oscuridad");
                 
                 jugador.agregarOro(25);
-                jugador.agregarItem("Antorcha de la Curiosidad");
-                jugador.agregarItem("Visión en la Oscuridad");
+                jugador.recibirItemTrama("antorcha");
                 jugador.ganarExperiencia(30);
                 estadoJuego.agregarLogro("EXPLORADOR_INICIAL");
                 break;
@@ -155,8 +172,7 @@ public class Game {
                 System.out.println("   - Habilidad: Discernimiento");
                 
                 jugador.agregarOro(40);
-                jugador.agregarItem("Espejo de la Verdad");
-                jugador.agregarItem("Discernimiento");
+                jugador.recibirItemTrama("espejo");
                 jugador.ganarExperiencia(45);
                 estadoJuego.agregarLogro("BUSCADOR_DE_VERDAD");
                 break;
@@ -169,16 +185,18 @@ public class Game {
                 System.out.println("   - Habilidad: Autoaceptación");
                 
                 jugador.agregarOro(60);
-                jugador.agregarItem("Medalla de Autoconocimiento");
-                jugador.agregarItem("Autoaceptación");
+                jugador.recibirItemTrama("amuleto");
                 jugador.ganarExperiencia(60);
                 estadoJuego.agregarLogro("MAESTRO_INTERIOR");
                 break;
         }
         
         // Recompensa base por completar cualquier piso
-        jugador.agregarItem("Llave del Progreso");
+        jugador.recibirItemTrama("llave_progreso");
         System.out.println("   - Llave del Progreso");
+        
+        // Restaurar al jugador entre pisos
+        jugador.restaurarCompletamente();
     }
 
     private void mostrarProgresoTotal() {
@@ -187,6 +205,8 @@ public class Game {
         System.out.println("Nivel actual: " + jugador.getNivel());
         System.out.println("Experiencia: " + jugador.getExperiencia() + "/" + jugador.getExperienciaParaSiguienteNivel());
         System.out.println("Oro acumulado: " + jugador.getOro() + " monedas");
+        System.out.println("Enemigos derrotados: " + estadoJuego.getTotalEnemigosDerrotados());
+        System.out.println("Puzzles resueltos: " + estadoJuego.getTotalPuzzlesResueltos());
         
         System.out.println("\nLogros obtenidos:");
         for (String logro : estadoJuego.getLogros()) {
@@ -198,7 +218,7 @@ public class Game {
         pisoNumero++;
         estadoJuego.setPisoActual(pisoNumero);
         
-        System.out.println("\n🌄 AVANZANDO AL SIGUIENTE PISO... 🌄");
+        System.out.println("\nAVANZANDO AL SIGUIENTE PISO... 🌄");
         System.out.println("Te preparas para enfrentar nuevos desafíos...");
         
         // Crear nuevo piso
@@ -241,7 +261,10 @@ public class Game {
         System.out.println("   • Nivel alcanzado: " + jugador.getNivel());
         System.out.println("   • Oro acumulado: " + jugador.getOro() + " monedas");
         System.out.println("   • Pisos completados: 3/3");
+        System.out.println("   • Enemigos derrotados: " + estadoJuego.getTotalEnemigosDerrotados());
+        System.out.println("   • Puzzles resueltos: " + estadoJuego.getTotalPuzzlesResueltos());
         System.out.println("   • Logros: " + estadoJuego.getLogros().size() + " obtenidos");
+        System.out.println("   • Tiempo jugado: " + (estadoJuego.getTiempoJugado() / 1000) + " segundos");
         System.out.println();
         System.out.println("«El verdadero viaje no es cruzar nuevos paisajes,");
         System.out.println(" sino tener nuevos ojos.» - Marcel Proust");
@@ -257,6 +280,8 @@ public class Game {
         System.out.println("📊 PROGRESO ALCANZADO:");
         System.out.println("   • Piso alcanzado: " + pisoNumero + "/3");
         System.out.println("   • Nivel: " + jugador.getNivel());
+        System.out.println("   • Enemigos derrotados: " + estadoJuego.getTotalEnemigosDerrotados());
+        System.out.println("   • Puzzles resueltos: " + estadoJuego.getTotalPuzzlesResueltos());
         System.out.println("   • Logros: " + estadoJuego.getLogros().size() + " obtenidos");
         System.out.println();
         System.out.println("La aventura puede continuar cuando estés listo para intentarlo de nuevo.");
@@ -271,6 +296,8 @@ public class Game {
         System.out.println("⏸️  PROGRESO GUARDADO:");
         System.out.println("   • Piso actual: " + pisoNumero + "/3");
         System.out.println("   • Progreso: " + pisoManager.getProgresoPorcentual() + "% completado");
+        System.out.println("   • Enemigos derrotados: " + estadoJuego.getTotalEnemigosDerrotados());
+        System.out.println("   • Puzzles resueltos: " + estadoJuego.getTotalPuzzlesResueltos());
         System.out.println();
         System.out.println("Cuando la curiosidad te llame de nuevo, estarás listo para continuar.");
     }
@@ -279,5 +306,6 @@ public class Game {
     public Jugador getJugador() { return jugador; }
     public int getPisoActual() { return pisoNumero; }
     public GameState getEstadoJuego() { return estadoJuego; }
+    public PisoManager getPisoManager() { return pisoManager; }
     public boolean isJuegoActivo() { return juegoActivo; }
 }

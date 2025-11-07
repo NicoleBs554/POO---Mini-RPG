@@ -1,17 +1,23 @@
 package levels;
 
 import java.util.Scanner;
-
 import combat.Combate;
 import entities.Jugador;
 import entities.Enemigo;
-
+import combat.Utils;
+import game.GameState;
 import java.util.*;
 
 public class Piso1_Limbo extends Piso {
+    private GameState estadoJuego;
     
     public Piso1_Limbo(Jugador p, Scanner in) {
         super(p, in);
+    }
+    
+    // Método para inyectar GameState
+    public void setGameState(GameState estadoJuego) {
+        this.estadoJuego = estadoJuego;
     }
     
     @Override
@@ -48,6 +54,11 @@ public class Piso1_Limbo extends Piso {
                 System.out.println("Esquivas hábilmente las esporas y pasas de largo. Encuentras 5 monedas.");
                 p.addGold(5);
                 p.addXp(8);
+                
+                // Actualizar GameState por éxito de habilidad
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
                 return;
             } else {
                 System.out.println("Las esporas te alcanzan! Te sientes pesado y lento.");
@@ -55,9 +66,15 @@ public class Piso1_Limbo extends Piso {
             }
         }
         
-        Enemy perezaflor = new Enemy("Perezaflor", 18, 3, 2, 75, "¡Descansa para siempre!");
-        boolean won = Combat.fight(p, Arrays.asList(perezaflor), in);
+        Enemigo perezaflor = new Enemigo("Perezaflor", "Planta", 18, 3, 2, 75);
+        perezaflor.setFraseCombate("¡Descansa para siempre!");
+        boolean won = Combate.fight(p, Arrays.asList(perezaflor), in);
         if (won) {
+            // Actualizar GameState
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            
             int oro = Utils.rnd(8, 12);
             p.addGold(oro);
             p.addItem("Espora Ralentizadora");
@@ -106,6 +123,11 @@ public class Piso1_Limbo extends Piso {
         }
         
         if (exitoSalto) {
+            // Actualizar GameState por puzzle resuelto
+            if (estadoJuego != null) {
+                estadoJuego.incrementarPuzzlesResueltos();
+            }
+            
             System.out.println("Encuentras un cofre oculto con 10 monedas y una poción.");
             p.addGold(10);
             p.addItem("Poción menor");
@@ -129,11 +151,21 @@ public class Piso1_Limbo extends Piso {
             System.out.println("Respuestas: A. 'Te leeré si me dejas pasar' / B. 'Eres muy interesante' / C. 'Todos te olvidaron'");
             String r = in.nextLine().trim().toUpperCase();
             if ("A".equals(r)) {
+                // Actualizar GameState por puzzle resuelto
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("Libro-Ciempiés: '¡Al fin alguien me valorará!' Te deja pasar y te da un hechizo.");
                 p.addItem("Hechizo de Comprensión");
                 p.addXp(12);
                 return;
             } else if ("B".equals(r)) {
+                // Actualizar GameState por puzzle resuelto
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("El libro se conmueve y te da un fragmento de conocimiento.");
                 p.addItem("Fragmento de Sabiduría");
                 p.addXp(8);
@@ -145,19 +177,28 @@ public class Piso1_Limbo extends Piso {
             boolean success = p.skillCheck(6);
             if (success) {
                 System.out.println("Encuentras que el lomo del libro es su punto débil. Atacas con ventaja!");
-                Enemigo libro = new Enemigo ("Libro-Ciempiés", 22, 4, 1, 70, "¡Mis páginas arden!");
-                libro.hp -= 5; // Daño inicial por encontrar debilidad
-                boolean won = Combat.fight(p, Arrays.asList(libro), in);
+                Enemigo libro = new Enemigo("Libro-Ciempiés", "Libro", 22, 4, 1, 70);
+                libro.setFraseCombate("¡Mis páginas arden!");
+                boolean won = Combate.fight(p, Arrays.asList(libro), in);
                 if (won) {
+                    // Actualizar GameState
+                    if (estadoJuego != null) {
+                        estadoJuego.incrementarEnemigosDerrotados();
+                    }
                     recompensaSala3();
                 }
                 return;
             }
         }
         
-        Enemigo libro = new Enemigo("Libro-Ciempiés", 22, 4, 3, 70, "¡Nadie me comprende!");
-        boolean won = Combat.fight(p, Arrays.asList(libro), in);
+        Enemigo libro = new Enemigo("Libro-Ciempiés", "Libro", 22, 4, 3, 70);
+        libro.setFraseCombate("¡Nadie me comprende!");
+        boolean won = Combate.fight(p, Arrays.asList(libro), in);
         if (won) {
+            // Actualizar GameState
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
             recompensaSala3();
         }
     }
@@ -179,6 +220,11 @@ public class Piso1_Limbo extends Piso {
         if ("2".equals(opt)) {
             boolean success = p.skillCheck(7);
             if (success) {
+                // Actualizar GameState por puzzle resuelto
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("Te mueves sigilosamente entre los hilos y evitas la confrontación.");
                 System.out.println("Encuentras un objeto brillante en una telaraña: Anillo de Agilidad");
                 p.addItem("Anillo de Agilidad");
@@ -190,6 +236,11 @@ public class Piso1_Limbo extends Piso {
         } else if ("3".equals(opt)) {
             System.out.println("Lanzas una piedra para distraer a la araña...");
             if (Utils.rnd(1, 10) <= 6) {
+                // Actualizar GameState por puzzle resuelto
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("La araña se distrae! Pasas tranquilamente.");
                 p.addXp(10);
                 return;
@@ -198,10 +249,15 @@ public class Piso1_Limbo extends Piso {
             }
         }
         
-        Enemy araña = new Enemy("Araña Despistada", 25, 5, 2, 80, "¡Ahí estás!");
-        // La araña tiene ataque especial de enredar
-        boolean won = Combat.fight(p, Arrays.asList(araña), in);
+        Enemigo araña = new Enemigo("Araña Despistada", "Araña", 25, 5, 2, 80);
+        araña.setFraseCombate("¡Ahí estás!");
+        boolean won = Combate.fight(p, Arrays.asList(araña), in);
         if (won) {
+            // Actualizar GameState
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            
             p.addGold(Utils.rnd(12, 18));
             p.addItem("Seda de Araña");
             p.addXp(20);
@@ -227,19 +283,27 @@ public class Piso1_Limbo extends Piso {
         if ("2".equals(opt)) {
             cloneCorrecto = true;
             System.out.println("Correcto! El clone 2 es el real - los fantasmas no proyectan sombras!");
+            
+            // Actualizar GameState por puzzle resuelto
+            if (estadoJuego != null) {
+                estadoJuego.incrementarPuzzlesResueltos();
+            }
         } else {
             System.out.println("Incorrecto! Atacas un clone ilusorio.");
             p.damage(5);
         }
         
-        Enemy fantasma = new Enemy("Fantasma de la Procrastinación", 30, 6, 4, 75, "¡Mañana lo haré mejor!");
-        if (cloneCorrecto) {
-            fantasma.hp -= 10; // Daño inicial por identificar correctamente
-            System.out.println("El fantasma real es herido! Comienza debilitado.");
-        }
+        Enemigo fantasma = new Enemigo("Fantasma de la Procrastinación", "Espíritu", 30, 6, 4, 75);
+        fantasma.setFraseCombate("¡Mañana lo haré mejor!");
         
-        boolean won = Combat.fight(p, Arrays.asList(fantasma), in);
+        boolean won = Combate.fight(p, Arrays.asList(fantasma), in);
         if (won) {
+            // Actualizar GameState - jefe derrotado
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+                estadoJuego.agregarEvento("Jefe Piso 1 - Fantasma de la Procrastinación derrotado");
+            }
+            
             System.out.println("Has derrotado al Fantasma de la Procrastinación!");
             p.addGold(Utils.rnd(20, 30));
             p.addItem("Esencia de Determinación");

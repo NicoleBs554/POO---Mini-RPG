@@ -33,10 +33,10 @@ public class Jugador {
     private boolean tieneEspejoVerdad;
     private boolean tieneAmuletoPerdon;
     
-    // Cheats (para desarrollo)
-    public boolean cheatVidaInfinita = false;
-    public boolean cheatUnGolpe = false;
-    public boolean cheatSaltarSalas = false;
+    // Cheats (para desarrollo) - Solo una versión para evitar duplicación
+    private boolean cheatVidaInfinita = false;
+    private boolean cheatUnGolpe = false;
+    private boolean cheatSaltarSalas = false;
     
     // Constructor
     public Jugador(String nombre, int maxHp, int maxEnergia, int ataqueBase) {
@@ -73,6 +73,9 @@ public class Jugador {
     public boolean estaVivo() {
         return hp > 0;
     }
+
+    // Wrapper en inglés
+    public boolean isAlive() { return estaVivo(); }
     
     public void mostrarEstado() {
         System.out.println("\n=== ESTADO DE " + nombre.toUpperCase() + " ===");
@@ -94,6 +97,9 @@ public class Jugador {
             }
         }
     }
+
+    // Wrapper en inglés
+    public void showStatus() { mostrarEstado(); }
     
     // Métodos de combate - Ahora consideran el equipo
     public int atacar() {
@@ -136,6 +142,9 @@ public class Jugador {
         int curado = hp - hpAnterior;
         System.out.println(nombre + " recupera " + curado + " HP.");
     }
+
+    // Wrapper en inglés
+    public void heal(int amount) { curar(amount); }
     
     public void restaurarEnergia(int cantidad) {
         int energiaAnterior = energia;
@@ -143,6 +152,9 @@ public class Jugador {
         int restaurado = energia - energiaAnterior;
         System.out.println(nombre + " recupera " + restaurado + " puntos de energía.");
     }
+
+    // Wrapper en inglés
+    public void restoreEnergy(int amount) { restaurarEnergia(amount); }
     
     // Métodos de progresión
     public void ganarExperiencia(int exp) {
@@ -153,6 +165,9 @@ public class Jugador {
             subirNivel();
         }
     }
+
+    // Wrapper en inglés
+    public void addXp(int xp) { ganarExperiencia(xp); }
     
     private void subirNivel() {
         nivel++;
@@ -221,6 +236,9 @@ public class Jugador {
     public boolean usarItem(String nombreItem) {
         return inventario.usarItem(nombreItem, this);
     }
+
+    // Wrapper en inglés
+    public boolean useItem(String nombreItem) { return usarItem(nombreItem); }
     
     public boolean usarItemEnCombate(String nombreItem) {
         return inventario.usarItemEnCombate(nombreItem, this);
@@ -237,6 +255,9 @@ public class Jugador {
     public boolean tieneItem(String nombreItem) {
         return inventario.tieneItem(nombreItem);
     }
+
+    // Wrapper en inglés
+    public boolean hasItem(String nombreItem) { return tieneItem(nombreItem); }
     
     public boolean tieneItemEspecial(String efectoUnico) {
         return inventario.tieneItemEspecial(efectoUnico);
@@ -302,20 +323,60 @@ public class Jugador {
     public void agregarOro(int cantidad) {
         inventario.agregarOro(cantidad);
     }
+
+    // Wrapper en inglés
+    public void addGold(int amount) { agregarOro(amount); }
+
+    // Añadir item por nombre (crea un ItemEspecial genérico si no existe otra fábrica)
+    public void addItem(String nombreItem) {
+        ItemEspecial especial = new ItemEspecial(nombreItem, "Objeto otorgado", TipoItem.FRAGMENTO, 0,
+                                                 nombreItem.toLowerCase().replaceAll(" ", "_"), false, "");
+        agregarItem(especial);
+    }
+
+    // Wrapper para recibir daño en inglés
+    public void damage(int dano) { recibirDano(dano); }
+
+    // Wrapper para skill checks en inglés
+    public boolean skillCheck(int dificultad) { return checkHabilidad(dificultad); }
     
     public boolean gastarOro(int cantidad) {
         return inventario.gastarOro(cantidad);
     }
     
-    // Getters y Setters
+    // Getters y Setters mejorados para compatibilidad
     public String getNombre() { return nombre; }
     public int getNivel() { return nivel; }
     public int getExperiencia() { return experiencia; }
     public int getExperienciaParaSiguienteNivel() { return experienciaParaSiguienteNivel; }
+    
+    // Getters y Setters para HP con lógica de validación
     public int getHp() { return hp; }
+    public void setHp(int hp) { 
+        this.hp = Math.max(0, Math.min(hp, maxHp)); 
+    }
     public int getMaxHp() { return maxHp; }
+    public void setMaxHp(int maxHp) { 
+        this.maxHp = maxHp; 
+        if (hp > maxHp) hp = maxHp;
+    }
+    
+    // Getters y Setters para Energía con lógica de validación
     public int getEnergia() { return energia; }
+    public void setEnergia(int energia) { 
+        this.energia = Math.max(0, Math.min(energia, maxEnergia)); 
+    }
     public int getMaxEnergia() { return maxEnergia; }
+    public void setMaxEnergia(int maxEnergia) { 
+        this.maxEnergia = maxEnergia; 
+        if (energia > maxEnergia) energia = maxEnergia;
+    }
+    
+    // Métodos de conveniencia para compatibilidad con Piso
+    public int getEn() { return getEnergia(); }
+    public void setEn(int energia) { setEnergia(energia); }
+    public int getMaxEn() { return getMaxEnergia(); }
+    public void setMaxEn(int maxEnergia) { setMaxEnergia(maxEnergia); }
     
     // Getters de estadísticas que consideran el equipo
     public int getAtaque() {
@@ -345,6 +406,32 @@ public class Jugador {
     public int getOro() { return inventario.getOro(); }
     
     public GestorInventario getInventario() { return inventario; }
+    
+    // Getters y Setters para cheats unificados
+    public boolean isCheatVidaInfinita() { return cheatVidaInfinita; }
+    public void setCheatVidaInfinita(boolean cheatVidaInfinita) { 
+        this.cheatVidaInfinita = cheatVidaInfinita; 
+    }
+    
+    public boolean isCheatUnGolpe() { return cheatUnGolpe; }
+    public void setCheatUnGolpe(boolean cheatUnGolpe) { 
+        this.cheatUnGolpe = cheatUnGolpe; 
+    }
+    
+    public boolean isCheatSaltarSalas() { return cheatSaltarSalas; }
+    public void setCheatSaltarSalas(boolean cheatSaltarSalas) { 
+        this.cheatSaltarSalas = cheatSaltarSalas; 
+    }
+    
+    // Wrappers en inglés para cheats (para compatibilidad con código existente)
+    public boolean isCheatInfiniteHealth() { return isCheatVidaInfinita(); }
+    public void setCheatInfiniteHealth(boolean value) { setCheatVidaInfinita(value); }
+    
+    public boolean isCheatOneHitKill() { return isCheatUnGolpe(); }
+    public void setCheatOneHitKill(boolean value) { setCheatUnGolpe(value); }
+    
+    public boolean isCheatSkipRooms() { return isCheatSaltarSalas(); }
+    public void setCheatSkipRooms(boolean value) { setCheatSaltarSalas(value); }
     
     public boolean isTieneAntorcha() { return tieneAntorcha; }
     public void setTieneAntorcha(boolean tiene) { 
@@ -430,5 +517,18 @@ public class Jugador {
             default:
                 return true;
         }
+    }
+    
+    // Método para restaurar completamente al jugador (útil entre pisos)
+    public void restaurarCompletamente() {
+        hp = maxHp;
+        energia = maxEnergia;
+        efectos.clear();
+        System.out.println(nombre + " ha sido restaurado completamente.");
+    }
+    
+    // Método para verificar si puede descansar (útil para la mecánica de descanso)
+    public boolean puedeDescansar() {
+        return hp < maxHp || energia < maxEnergia;
     }
 }

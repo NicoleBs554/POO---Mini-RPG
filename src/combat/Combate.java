@@ -2,7 +2,6 @@ package combat;
 
 import entities.Jugador;
 import entities.Enemigo;
-import combat.Habilidad;
 import java.util.*;
 
 public class Combate {
@@ -299,5 +298,10 @@ public class Combate {
     public static boolean combateRapido(Jugador jugador, List<Enemigo> enemigos, Scanner scanner) {
         Combate combate = new Combate(jugador, enemigos, scanner);
         return combate.iniciarCombate();
+    }
+
+    // Nuevo alias legacy para compatibilidad con niveles que usan Combate.fight(...)
+    public static boolean fight(Jugador jugador, List<Enemigo> enemigos, Scanner scanner) {
+        return combateRapido(jugador, enemigos, scanner);
     }
 }

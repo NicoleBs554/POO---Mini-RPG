@@ -25,6 +25,9 @@ public class Enemigo {
     private boolean creaIlusiones;
     private boolean aplicaRalentizacion;
     
+    // Modificador de daño público (por defecto 1.0)
+    private float damageModifier = 1.0f;
+    
     public Enemigo(String nombre, String tipo, int maxHp, int ataque, int defensa, int experienciaOtorgada) {
         this.nombre = nombre;
         this.tipo = tipo;
@@ -41,6 +44,7 @@ public class Enemigo {
         // Habilidades básicas según tipo
         inicializarHabilidadesPorTipo();
     }
+
     
     private void inicializarHabilidadesPorTipo() {
         switch (tipo.toLowerCase()) {
@@ -95,7 +99,7 @@ public class Enemigo {
     
     // Métodos de combate
     public int atacar() {
-        int danoBase = ataque + Utils.rnd(1, 3);
+        int danoBase = (int)((ataque + Utils.rnd(1, 3)) * damageModifier);
         
         // Modificadores por efectos
         if (tieneEfecto("Debilitado")) {
@@ -115,7 +119,8 @@ public class Enemigo {
         
         Habilidad habilidad = habilidades.get(Utils.rnd(0, habilidades.size() - 1));
         System.out.println(nombre + " usa " + habilidad.getNombre() + "!");
-        return habilidad.calcularDano(this);
+        int dano = habilidad.calcularDano(this);
+        return (int)(dano * damageModifier);
     }
     
     public void recibirDano(int dano) {
@@ -188,6 +193,42 @@ public class Enemigo {
     public boolean isDebilEspejo() { return debilEspejo; }
     public boolean isCreaIlusiones() { return creaIlusiones; }
     
+    // Setter público de HP (compatibilidad)
+    public void setHp(int nuevoHp) {
+        this.hp = Math.max(0, Math.min(this.maxHp, nuevoHp));
+    }
+
+    // Setters para otras estadísticas (compatibilidad / ajuste dinámico)
+    public void setMaxHp(int maxHp) {
+        this.maxHp = Math.max(1, maxHp);
+        if (this.hp > this.maxHp) this.hp = this.maxHp;
+    }
+
+    public void setAtaque(int ataque) {
+        this.ataque = ataque;
+    }
+
+    public void setDefensa(int defensa) {
+        this.defensa = defensa;
+    }
+
+    public void setAgilidad(int agilidad) {
+        this.agilidad = agilidad;
+    }
+
+    public void setExperienciaOtorgada(int exp) {
+        this.experienciaOtorgada = exp;
+    }
+
+    // Setter y getter para el modificador de daño
+    public void setDamageModifier(float modifier) {
+        this.damageModifier = modifier;
+    }
+
+    public float getDamageModifier() {
+        return this.damageModifier;
+    }
+
     // Método para enemigos especiales de la trama
     public static Enemigo crearEnemigoEspecial(String tipoEspecial) {
         switch (tipoEspecial) {

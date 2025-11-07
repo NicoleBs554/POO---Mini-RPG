@@ -1,17 +1,23 @@
 package levels;
 
-import entities.Player;
-import entities.Enemy;
-import mechanics.Combat;
-import mechanics.Utils;
+import entities.Jugador;
+import entities.Enemigo;
+import combat.Combate;
+import combat.Utils;
+import game.GameState;
 import java.util.*;
 
 public class Piso3_Recuerdos extends Piso {
     private boolean puzzleSonidosResuelto = false;
     private int recuerdosSanadores = 0;
+    private GameState estadoJuego;
     
-    public Piso3_Recuerdos(Player p, Scanner in) {
+    public Piso3_Recuerdos(Jugador p, Scanner in) {
         super(p, in);
+    }
+    
+    public void setGameState(GameState estadoJuego) {
+        this.estadoJuego = estadoJuego;
     }
     
     @Override
@@ -48,10 +54,15 @@ public class Piso3_Recuerdos extends Piso {
             String respuesta = in.nextLine().trim().toUpperCase();
             if ("A".equals(respuesta)) {
                 System.out.println("El Tío se queda sin palabras! Su poder se debilita.");
-                Enemy tio = new Enemy("Tío Crítico", 25, 4, 3, 70, "¡Bah! Pura suerte...");
-                tio.hp -= 10;
-                boolean won = Combat.fight(p, Arrays.asList(tio), in);
-                if (won) recompensaSala1();
+                Enemigo tio = new Enemigo("Tío Crítico", "Familiar", 25, 4, 3, 70);
+                tio.setFraseCombate("¡Bah! Pura suerte...");
+                boolean won = Combate.fight(p, Arrays.asList(tio), in);
+                if (won) {
+                    if (estadoJuego != null) {
+                        estadoJuego.incrementarEnemigosDerrotados();
+                    }
+                    recompensaSala1();
+                }
                 return;
             }
         } else if ("3".equals(opt) && p.hasItem("Amuleto de Confianza")) {
@@ -59,9 +70,15 @@ public class Piso3_Recuerdos extends Piso {
             recuerdosSanadores++;
         }
         
-        Enemy tio = new Enemy("Tío Crítico", 25, 4, 3, 70, "¡No eres lo suficientemente bueno!");
-        boolean won = Combat.fight(p, Arrays.asList(tio), in);
-        if (won) recompensaSala1();
+        Enemigo tio = new Enemigo("Tío Crítico", "Familiar", 25, 4, 3, 70);
+        tio.setFraseCombate("¡No eres lo suficientemente bueno!");
+        boolean won = Combate.fight(p, Arrays.asList(tio), in);
+        if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            recompensaSala1();
+        }
     }
     
     private void recompensaSala1() {
@@ -82,10 +99,15 @@ public class Piso3_Recuerdos extends Piso {
             boolean success = p.skillCheck(6);
             if (success) {
                 System.out.println("Te enfocas en tu propio progreso! Los clones pierden poder.");
-                Enemy primera = new Enemy("Primera Celosa", 22, 3, 2, 75, "¡Pero merezco más!");
-                primera.hp -= 8;
-                boolean won = Combat.fight(p, Arrays.asList(primera), in);
-                if (won) recompensaSala2();
+                Enemigo primera = new Enemigo("Prima Celosa", "Familiar", 22, 3, 2, 75);
+                primera.setFraseCombate("¡Pero merezco más!");
+                boolean won = Combate.fight(p, Arrays.asList(primera), in);
+                if (won) {
+                    if (estadoJuego != null) {
+                        estadoJuego.incrementarEnemigosDerrotados();
+                    }
+                    recompensaSala2();
+                }
                 return;
             }
         } else if ("3".equals(opt)) {
@@ -94,9 +116,15 @@ public class Piso3_Recuerdos extends Piso {
             recuerdosSanadores++;
         }
         
-        Enemy primera = new Enemy("Primera Celosa", 22, 3, 2, 75, "¡Quiero lo tuyo!");
-        boolean won = Combat.fight(p, Arrays.asList(primera), in);
-        if (won) recompensaSala2();
+        Enemigo primera = new Enemigo("Prima Celosa", "Familiar", 22, 3, 2, 75);
+        primera.setFraseCombate("¡Quiero lo tuyo!");
+        boolean won = Combate.fight(p, Arrays.asList(primera), in);
+        if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            recompensaSala2();
+        }
     }
     
     private void recompensaSala2() {
@@ -117,15 +145,27 @@ public class Piso3_Recuerdos extends Piso {
         
         if (puzzleSonidosResuelto) {
             System.out.println("Los sonidos armoniosos ablandan la rigidez del Abuelo.");
-            Enemy abuelo = new Enemy("Abuelo Rigidez", 20, 5, 4, 65, "¿Tal vez... hay nuevas formas?");
-            boolean won = Combat.fight(p, Arrays.asList(abuelo), in);
-            if (won) recompensaSala3();
+            Enemigo abuelo = new Enemigo("Abuelo Rigidez", "Familiar", 20, 5, 4, 65);
+            abuelo.setFraseCombate("¿Tal vez... hay nuevas formas?");
+            boolean won = Combate.fight(p, Arrays.asList(abuelo), in);
+            if (won) {
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarEnemigosDerrotados();
+                }
+                recompensaSala3();
+            }
         } else {
             System.out.println("La rigidez mental te afecta! Pierdes 5 HP.");
             p.damage(5);
-            Enemy abuelo = new Enemy("Abuelo Rigidez", 30, 5, 4, 65, "¡A la antigua usanza!");
-            boolean won = Combat.fight(p, Arrays.asList(abuelo), in);
-            if (won) recompensaSala3();
+            Enemigo abuelo = new Enemigo("Abuelo Rigidez", "Familiar", 30, 5, 4, 65);
+            abuelo.setFraseCombate("¡A la antigua usanza!");
+            boolean won = Combate.fight(p, Arrays.asList(abuelo), in);
+            if (won) {
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarEnemigosDerrotados();
+                }
+                recompensaSala3();
+            }
         }
     }
     
@@ -143,12 +183,16 @@ public class Piso3_Recuerdos extends Piso {
         
         String respuesta = in.nextLine().trim().toUpperCase();
         if ("B".equals(respuesta)) {
-            System.out.println("✅ Correcto! Sanación completa: Enfrentar conflicto -> Recordar con cariño -> Recuperar inocencia -> Encontrar paz");
+            if (estadoJuego != null) {
+                estadoJuego.incrementarPuzzlesResueltos();
+            }
+            
+            System.out.println("Correcto! Sanación completa: Enfrentar conflicto -> Recordar con cariño -> Recuperar inocencia -> Encontrar paz");
             puzzleSonidosResuelto = true;
             p.addItem("Amuleto del Perdón");
             recuerdosSanadores += 2;
         } else {
-            System.out.println("❌ Esa secuencia no lleva a la sanación verdadera.");
+            System.out.println("Esa secuencia no lleva a la sanación verdadera.");
         }
     }
     
@@ -179,10 +223,14 @@ public class Piso3_Recuerdos extends Piso {
             }
         }
         
-        Enemy hermano = new Enemy("Hermano Mayor Burlesco", 28, 4, 3, 78, "¡Siempre serás el pequeño!");
-        // El hermano tiene habilidad especial de hacer resbalar
-        boolean won = Combat.fight(p, Arrays.asList(hermano), in);
+        Enemigo hermano = new Enemigo("Hermano Mayor Burlesco", "Familiar", 28, 4, 3, 78);
+        hermano.setFraseCombate("¡Siempre serás el pequeño!");
+        boolean won = Combate.fight(p, Arrays.asList(hermano), in);
         if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            
             p.addGold(Utils.rnd(20, 28));
             p.addItem("Confianza Adquirida");
             p.addXp(28);
@@ -194,36 +242,38 @@ public class Piso3_Recuerdos extends Piso {
         System.out.println("Tu propia inseguridad personificada. Se alimenta de tus dudas.");
         System.out.println("Sombra: 'Mírate... ¿realmente crees que puedes vencer? Sabes quién ERES'");
         
-        // El jefe final se debilita con los recuerdos sanadores
         int debilidad = recuerdosSanadores * 5;
-        
-        System.out.println("Tus recuerdos sanadores debilitan a la Sombra (-" + debilidad + " HP)");
+        System.out.println("Tus recuerdos sanadores debilitan a la Sombra (-" + debilidad + " HP de ventaja)");
         
         System.out.println("Opciones: 1. Enfrentar miedos / 2. Usar recuerdos felices / 3. Aceptación / 4. Combate final");
         
-        Enemy sombra = new Enemy("Sombra del Pasado", 40 - debilidad, 8, 6, 82, "¡Conozco todas tus debilidades!");
+        Enemigo sombra = new Enemigo("Sombra del Pasado", "Familiar", 40, 8, 6, 82);
+        sombra.setFraseCombate("¡Conozco todas tus debilidades!");
         
         String opt = in.nextLine().trim();
         if ("2".equals(opt) && p.hasItem("Recuerdo Feliz")) {
             System.out.println("Usas un recuerdo feliz! La Sombra retrocede dolorida.");
-            sombra.hp -= 15;
             p.useItem("Recuerdo Feliz");
         } else if ("3".equals(opt)) {
             System.out.println("Aceptas tus imperfecciones... La Sombra pierde poder sobre ti.");
-            sombra.damage -= 2;
         }
         
         System.out.println("=== COMBATE FINAL ===");
-        boolean won = Combat.fight(p, Arrays.asList(sombra), in);
+        boolean won = Combate.fight(p, Arrays.asList(sombra), in);
         
         if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+                estadoJuego.agregarEvento("Jefe Final - Sombra del Pasado derrotado");
+            }
+            
             desenlaceFinal();
         }
     }
     
     private void desenlaceFinal() {
         System.out.println("\n" + "=".repeat(50));
-        System.out.println("✨ LA SOMBRA SE DISUELVE EN LUZ ✨");
+        System.out.println("LA SOMBRA SE DISUELVE EN LUZ ✨");
         System.out.println("=".repeat(50));
         System.out.println("La Sombra del Pasado: 'Tal vez... tal vez eres más fuerte de lo que pensé'");
         System.out.println("Las voces familiares se desvanecen, convertidas en susurros de apoyo.");
@@ -238,7 +288,7 @@ public class Piso3_Recuerdos extends Piso {
         System.out.println("- Medalla de Superación Personal");
         System.out.println("- 60 puntos de experiencia");
         
-        System.out.println("\n🎉 ¡FELICIDADES! HAS COMPLETADO 'EL VIAJE INESPERADO DE LEO' 🎉");
+        System.out.println("\n¡FELICIDADES! HAS COMPLETADO 'EL VIAJE INESPERADO DE LEO' 🎉");
         System.out.println("Leo regresa al pueblo transformado, llevando consigo la sabiduría");
         System.out.println("obtenida en este viaje through los círculos de sus miedos y dudas.");
     }

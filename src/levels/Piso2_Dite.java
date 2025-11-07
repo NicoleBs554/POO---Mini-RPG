@@ -2,15 +2,21 @@ package levels;
 
 import entities.Jugador;
 import entities.Enemigo;
-import combat.Combate;;
+import combat.Combate;
 import combat.Utils;
+import game.GameState;
 import java.util.*;
 
 public class Piso2_Dite extends Piso {
     private boolean puzzleResuelto = false;
+    private GameState estadoJuego;
     
     public Piso2_Dite(Jugador p, Scanner in) {
         super(p, in);
+    }
+    
+    public void setGameState(GameState estadoJuego) {
+        this.estadoJuego = estadoJuego;
     }
     
     @Override
@@ -45,26 +51,43 @@ public class Piso2_Dite extends Piso {
             boolean success = p.skillCheck(6);
             if (success) {
                 System.out.println("Descubres su patrón de ataque! Atacas en su punto ciego.");
-                Enemy fanatico = new Enemy("Fanático de Cristal", 28, 5, 4, 70, "¡Imposible!");
-                fanatico.hp -= 8;
-                boolean won = Combat.fight(p, Arrays.asList(fanatico), in);
-                if (won) recompensaSala1();
+                Enemigo fanatico = new Enemigo("Fanático de Cristal", "Cristal", 28, 5, 4, 70);
+                fanatico.setFraseCombate("¡Imposible!");
+                boolean won = Combate.fight(p, Arrays.asList(fanatico), in);
+                if (won) {
+                    if (estadoJuego != null) {
+                        estadoJuego.incrementarEnemigosDerrotados();
+                    }
+                    recompensaSala1();
+                }
                 return;
             }
         } else if ("3".equals(opt)) {
             System.out.println("Golpeas fuertemente el cristal...");
             if (Utils.rnd(1, 10) <= 4) {
                 System.out.println("El cristal se agrieta! Está debilitado.");
-                Enemy fanatico = new Enemy("Fanático de Cristal", 20, 5, 2, 70, "¡Mi forma perfecta!");
-                boolean won = Combat.fight(p, Arrays.asList(fanatico), in);
-                if (won) recompensaSala1();
+                Enemigo fanatico = new Enemigo("Fanático de Cristal", "Cristal", 20, 5, 2, 70);
+                fanatico.setFraseCombate("¡Mi forma perfecta!");
+                boolean won = Combate.fight(p, Arrays.asList(fanatico), in);
+                if (won) {
+                    if (estadoJuego != null) {
+                        estadoJuego.incrementarEnemigosDerrotados();
+                    }
+                    recompensaSala1();
+                }
                 return;
             }
         }
         
-        Enemigo fanatico = new Enemigo("Fanático de Cristal", 28, 5, 4, 70, "¡La verdad duele!");
+        Enemigo fanatico = new Enemigo("Fanático de Cristal", "Cristal", 28, 5, 4, 70);
+        fanatico.setFraseCombate("¡La verdad duele!");
         boolean won = Combate.fight(p, Arrays.asList(fanatico), in);
-        if (won) recompensaSala1();
+        if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            recompensaSala1();
+        }
     }
     
     private void recompensaSala1() {
@@ -84,6 +107,10 @@ public class Piso2_Dite extends Piso {
         }
         
         if (puzzleResuelto) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarPuzzlesResueltos();
+            }
+            
             System.out.println("Los espejos se alinean y revelan el camino verdadero.");
             p.addItem("Espejo de la Verdad");
             p.addXp(15);
@@ -104,10 +131,10 @@ public class Piso2_Dite extends Piso {
         
         String respuesta = in.nextLine().trim();
         if (respuesta.equals("3 2 1 4") || respuesta.equals("3214")) {
-            System.out.println("✅ Correcto! Los espejos se alinean en la secuencia: Verdad -> Camino -> Inicio -> Destino");
+            System.out.println("Correcto! Los espejos se alinean en la secuencia: Verdad -> Camino -> Inicio -> Destino");
             puzzleResuelto = true;
         } else {
-            System.out.println("❌ Secuencia incorrecta. Los espejos se distorsionan más.");
+            System.out.println("Secuencia incorrecta. Los espejos se distorsionan más.");
         }
     }
     
@@ -119,6 +146,11 @@ public class Piso2_Dite extends Piso {
         if (p.hasItem("Nuez Dorada")) {
             System.out.println("Usas la Nuez Dorada para atraer a la ardilla...");
             System.out.println("La ardilla suelta tu objeto robado y huye.");
+            
+            if (estadoJuego != null) {
+                estadoJuego.incrementarPuzzlesResueltos();
+            }
+            
             p.addItem("Objeto Recuperado");
             p.addXp(10);
             return;
@@ -130,6 +162,10 @@ public class Piso2_Dite extends Piso {
         if ("2".equals(opt)) {
             boolean success = p.skillCheck(5);
             if (success) {
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("Armas una trampa ingeniosa y atrapas a la ardilla!");
                 p.addGold(15);
                 p.addItem("Nuez Dorada");
@@ -140,9 +176,13 @@ public class Piso2_Dite extends Piso {
             System.out.println("Intentas negociar con la ardilla...");
             System.out.println("Ofreces: A. 5 monedas / B. Una poción / C. Un hechizo");
             String oferta = in.nextLine().trim().toUpperCase();
-            if ("A".equals(oferta) && p.gold >= 5) {
+            if ("A".equals(oferta) && p.getOro() >= 5) {
+                if (estadoJuego != null) {
+                    estadoJuego.incrementarPuzzlesResueltos();
+                }
+                
                 System.out.println("La ardilla acepta las monedas y te devuelve tu objeto.");
-                p.gold -= 5;
+                p.gastarOro(5);
                 p.addItem("Objeto Recuperado");
                 p.addXp(8);
                 return;
@@ -150,7 +190,6 @@ public class Piso2_Dite extends Piso {
         }
         
         System.out.println("La ardilla escapa con tu objeto! Pierdes un item aleatorio.");
-        // Implementar pérdida de item aleatorio
         p.addXp(5);
     }
     
@@ -175,13 +214,15 @@ public class Piso2_Dite extends Piso {
             p.useItem("Antídoto");
         }
         
-        Enemigo serpiente = new Enemigo("Serpiente de la Envidia", 32, 6, 3, 75, "¡Quiero lo que tienes!");
-        if (resistencia) {
-            serpiente.damageModifier = 0.5f; // Mitad de daño por veneno
-        }
+        Enemigo serpiente = new Enemigo("Serpiente de la Envidia", "Serpiente", 32, 6, 3, 75);
+        serpiente.setFraseCombate("¡Quiero lo que tienes!");
         
-        boolean won = Combat.fight(p, Arrays.asList(serpiente), in);
+        boolean won = Combate.fight(p, Arrays.asList(serpiente), in);
         if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+            }
+            
             p.addGold(Utils.rnd(15, 22));
             p.addItem("Veneno Purificado");
             p.addXp(25);
@@ -200,26 +241,30 @@ public class Piso2_Dite extends Piso {
         
         System.out.println("Opciones: 1. Romper espejos / 2. Atacar reflejos / 3. Habilidad verdadera / 4. Cerrar ojos");
         
-        Enemigo hechicero = new Enemigo("Espejo Hechicero", 35, 7, 5, 80, "¡Tu reflejo te traicionará!");
+        Enemigo hechicero = new Enemigo("Espejo Hechicero", "Hechicero", 35, 7, 5, 80);
+        hechicero.setFraseCombate("¡Tu reflejo te traicionará!");
         
         String opt = in.nextLine().trim();
         if ("1".equals(opt)) {
             System.out.println("Rompes los espejos alrededor...");
             if (Utils.rnd(1, 10) <= 6) {
                 System.out.println("El hechicero pierde su escondite! Está aturdido.");
-                hechicero.hp -= 8;
             }
         } else if ("4".equals(opt)) {
             System.out.println("Cierras los ojos y confías en otros sentidos...");
             boolean success = p.skillCheck(8);
             if (success) {
                 System.out.println("Localizas al hechicero real por su respiración! Atacas con precisión.");
-                hechicero.hp -= 12;
             }
         }
         
         boolean won = Combate.fight(p, Arrays.asList(hechicero), in);
         if (won) {
+            if (estadoJuego != null) {
+                estadoJuego.incrementarEnemigosDerrotados();
+                estadoJuego.agregarEvento("Jefe Piso 2 - Espejo Hechicero derrotado");
+            }
+            
             System.out.println("El Espejo Hechicero se desvanece en mil fragmentos!");
             p.addGold(Utils.rnd(25, 35));
             p.addItem("Fragmento de Espejo Mágico");

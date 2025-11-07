@@ -45,7 +45,7 @@ public abstract class Item {
     }
     
     public boolean apilar(Item otroItem) {
-        if (this.apilable && otroItem.getClass().equals(this.getClass()) && 
+        if (this.apilable && otroItem.getClass().equals(this.getClass()) &&
             otroItem.nombre.equals(this.nombre) && this.cantidad < this.cantidadMaxima) {
             int espacioDisponible = this.cantidadMaxima - this.cantidad;
             int cantidadAApilar = Math.min(espacioDisponible, otroItem.cantidad);

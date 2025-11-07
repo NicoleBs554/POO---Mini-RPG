@@ -1,7 +1,6 @@
 package items;
 
 import entities.Jugador;
-import combat.CombatUtils;
 
 public class Arma extends Item {
     private int danoBase;
@@ -11,6 +10,8 @@ public class Arma extends Item {
     private String efectoEspecial;
     private int durabilidad;
     private int durabilidadMaxima;
+    private boolean equipada;
+    private int bonificacionAtaque; // Nueva variable para almacenar la bonificación
     
     public Arma(String nombre, String descripcion, int valor, int danoBase, 
                 int precision, int velocidadAtaque, String efectoEspecial, int durabilidadMaxima) {
@@ -22,20 +23,40 @@ public class Arma extends Item {
         this.efectoEspecial = efectoEspecial;
         this.durabilidadMaxima = durabilidadMaxima;
         this.durabilidad = durabilidadMaxima;
+        this.equipada = false;
+        this.bonificacionAtaque = danoBase;
     }
     
     @Override
     public void usar(Jugador jugador) {
-        // En el sistema de combate, el arma se usa automáticamente al atacar
-        System.out.println("Equipas " + nombre + " como arma principal.");
-        reducirDurabilidad(1);
+        if (!equipada) {
+            equipar(jugador);
+        } else {
+            desequipar(jugador);
+        }
+    }
+    
+    public void equipar(Jugador jugador) {
+        if (!equipada) {
+            System.out.println("Equipas " + nombre + " como arma principal.");
+            aplicarEfectosEquipo(jugador);
+            equipada = true;
+            reducirDurabilidad(1);
+        }
+    }
+    
+    public void desequipar(Jugador jugador) {
+        if (equipada) {
+            System.out.println("Desequipas " + nombre + ".");
+            removerEfectosEquipo(jugador);
+            equipada = false;
+        }
     }
     
     @Override
     public void aplicarEfectosEquipo(Jugador jugador) {
-        // Aplicar bonificaciones al equipar el arma
-        jugador.setAtaque(jugador.getAtaque() + danoBase + danoExtra);
-        System.out.println(nombre + " equipada! +" + (danoBase + danoExtra) + " al ataque.");
+        // En lugar de modificar atributos directamente, almacenamos la bonificación
+        System.out.println(nombre + " equipada! +" + bonificacionAtaque + " al ataque.");
         
         // Aplicar efectos especiales
         aplicarEfectoEspecial(jugador);
@@ -43,12 +64,25 @@ public class Arma extends Item {
     
     @Override
     public void removerEfectosEquipo(Jugador jugador) {
-        // Remover bonificaciones al desequipar
-        jugador.setAtaque(jugador.getAtaque() - (danoBase + danoExtra));
-        System.out.println(nombre + " desequipada. -" + (danoBase + danoExtra) + " al ataque.");
+        System.out.println(nombre + " desequipada. -" + bonificacionAtaque + " al ataque.");
         
         // Remover efectos especiales
         removerEfectoEspecial(jugador);
+    }
+    
+    // Nuevo método para obtener el daño del arma en combate
+    public int getDanoCombate() {
+        return getDanoTotal();
+    }
+    
+    // Nuevo método para verificar si está equipada
+    public boolean isEquipada() {
+        return equipada;
+    }
+    
+    // Nuevo método para obtener la bonificación de ataque
+    public int getBonificacionAtaque() {
+        return bonificacionAtaque;
     }
     
     private void aplicarEfectoEspecial(Jugador jugador) {
@@ -81,7 +115,7 @@ public class Arma extends Item {
         durabilidad = Math.max(0, durabilidad - cantidad);
         if (durabilidad <= 0) {
             System.out.println("¡" + nombre + " se ha roto!");
-            // En una implementación completa, se desequiparía automáticamente
+            equipada = false;
         }
     }
     
@@ -92,6 +126,7 @@ public class Arma extends Item {
     
     public void mejorar(int danoExtra) {
         this.danoExtra += danoExtra;
+        this.bonificacionAtaque = danoBase + this.danoExtra;
         System.out.println(nombre + " mejorada! +" + danoExtra + " daño extra.");
     }
     
