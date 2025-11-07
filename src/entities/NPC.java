@@ -91,10 +91,11 @@ public class NPC {
             if (indice >= 0 && indice < temas.size()) {
                 System.out.println(nombre + ": " + getDialogo(temas.get(indice)));
             } else if (indice == temas.size()) {
-                System.out.print("¿Qué quieres preguntar?: ");
-                String pregunta = scanner.nextLine().trim();
-                System.out.println(nombre + ": " + getDialogo("default"));
-            }
+                    System.out.print("¿Qué quieres preguntar?: ");
+                    String pregunta = scanner.nextLine().trim();
+                    // Usar la pregunta para intentar obtener un diálogo específico, o caer al por defecto
+                    System.out.println(nombre + ": " + getDialogo(pregunta));
+                }
         } catch (NumberFormatException e) {
             // Buscar tema por nombre
             String dialogo = getDialogo(opcion.toLowerCase());

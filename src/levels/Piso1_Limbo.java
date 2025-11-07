@@ -278,10 +278,8 @@ public class Piso1_Limbo extends Piso {
         System.out.println("Clone 3: Parpadea ligeramente");
         
         String opt = in.nextLine().trim();
-        boolean cloneCorrecto = false;
         
         if ("2".equals(opt)) {
-            cloneCorrecto = true;
             System.out.println("Correcto! El clone 2 es el real - los fantasmas no proyectan sombras!");
             
             // Actualizar GameState por puzzle resuelto

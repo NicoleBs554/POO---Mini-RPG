@@ -1,5 +1,3 @@
-package game;
- 
  // ...existing code...
 
 import game.Game;
