@@ -28,10 +28,10 @@ public class Piso3_Recuerdos extends Piso {
         if (!preRoom("Sala 1: Tío Crítico")) sala1();
         if (!p.isAlive()) return;
         
-        if (!preRoom("Sala 2: Primera Celosa")) sala2();
+        if (!preRoom("Sala 2: Prima Celosa")) sala2();
         if (!p.isAlive()) return;
         
-        if (!preRoom("Sala 3: Abuelo Rigidez")) sala3();
+        if (!preRoom("Sala 3: Abuelo Rigido")) sala3();
         if (!p.isAlive()) return;
         
         if (!preRoom("Sala 4: Hermano Mayor Burlesco")) sala4();
@@ -88,7 +88,7 @@ public class Piso3_Recuerdos extends Piso {
     }
     
     private void sala2() {
-        System.out.println("\n--- Sala 2: Primera Celosa ---");
+        System.out.println("\n--- Sala 2: Prima Celosa ---");
         System.out.println("Una figura que invoca clones ilusorios de tus logros y los de otros.");
         System.out.println("Primera Celosa: 'Mira lo que ELLOS tienen... ¿por qué tú no?'");
         
@@ -134,7 +134,7 @@ public class Piso3_Recuerdos extends Piso {
     }
     
     private void sala3() {
-        System.out.println("\n--- Sala 3: Abuelo Rigidez ---");
+        System.out.println("\n--- Sala 3: Abuelo Rigido ---");
         System.out.println("Crea laberintos mentales de 'deberías' y 'siempre se ha hecho así'.");
         System.out.println("Abuelo Rigidez: 'En mis tiempos... las cosas eran diferentes y MEJORES'");
         
@@ -288,7 +288,7 @@ public class Piso3_Recuerdos extends Piso {
         System.out.println("- Medalla de Superación Personal");
         System.out.println("- 60 puntos de experiencia");
         
-        System.out.println("\n¡FELICIDADES! HAS COMPLETADO 'EL VIAJE INESPERADO DE LEO' 🎉");
+        System.out.println("\n¡FELICIDADES! HAS COMPLETADO 'DITE'S CITY' 🎉");
         System.out.println("Leo regresa al pueblo transformado, llevando consigo la sabiduría");
         System.out.println("obtenida en este viaje through los círculos de sus miedos y dudas.");
     }

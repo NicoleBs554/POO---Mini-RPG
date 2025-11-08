@@ -42,8 +42,8 @@ public class Game {
 
     private void mostrarIntro() {
         System.out.println("╔══════════════════════════════════════════════════╗");
-        System.out.println("║           EL VIAJE INESPERADO DE LEO            ║");
-        System.out.println("║      De las Sombras a la Autodescubrimiento     ║");
+        System.out.println("║                   DITE'S CITY                    ║");
+        System.out.println("║         El Umbral de los Sueños Perdidos         ║");
         System.out.println("╚══════════════════════════════════════════════════╝");
         
         System.out.println("\nEn un pueblo ordinario, donde los colores se desvanecen en la rutina...");
